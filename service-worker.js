@@ -1,4 +1,4 @@
-const CACHE_NAME = "evntrs-pwa-v1";
+const CACHE_NAME = "evntrs-pwa-v2";
 
 const STATIC_FILES = [
   "/",
