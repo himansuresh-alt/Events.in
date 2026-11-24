@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EVNTR | Event Booking</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#0d0f12;--panel:#15181d;--panel2:#1d2128;--line:#2b3038;--gold:#d7b778;--gold2:#f0d8a6;--text:#f4f1ea;--muted:#9ba1aa;--green:#8bc7a1;--red:#e58b8b}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 80% -10%,#27231b 0,transparent 38%),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.wrap{max-width:1180px;margin:auto;padding:24px 22px 70px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:24px}
+.brand{display:flex;align-items:center;gap:12px}
+.mark{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#f0d8a6,#b28b4d);display:grid;place-items:center;color:#111;font-weight:900;font-size:18px;box-shadow:0 8px 30px #d7b77822}
+.brandname{font-size:22px;font-weight:800;letter-spacing:2.5px}
+.subbrand{font-size:10px;color:var(--muted);letter-spacing:2px;margin-top:3px}
+.top-actions{display:flex;gap:10px;align-items:center}
+.ghost,.primary{border:1px solid var(--line);background:#1b1e24;color:var(--text);border-radius:12px;padding:11px 14px}
+.primary{background:linear-gradient(135deg,#e2c68e,#b58d4f);color:#171513;border:0;font-weight:750}
+.avatar{width:40px;height:40px;border-radius:50%;border:1px solid #514530;background:#29251e;color:var(--gold);display:grid;place-items:center;font-weight:700}
+.hero{display:flex;justify-content:space-between;align-items:flex-end;margin:12px 0 22px;gap:20px}
+.eyebrow{color:var(--gold);font-size:11px;letter-spacing:2.2px;font-weight:700}
+.hero h1{font-size:clamp(28px,4vw,43px);margin:8px 0 5px;letter-spacing:-1.2px}
+.hero p{color:var(--muted);margin:0;font-size:14px}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.stat{background:linear-gradient(135deg,#191c21,#14171b);border:1px solid var(--line);border-radius:17px;padding:16px}
+.stat-label{font-size:12px;color:var(--muted)}
+.stat-value{font-size:23px;font-weight:750;margin-top:8px}
+.stat-value.gold{color:var(--gold2)}
+
+.calendar-panel{background:linear-gradient(145deg,#171a1f,#121418);border:1px solid var(--line);border-radius:22px;padding:20px;margin-bottom:22px;box-shadow:0 20px 60px #0003}
+.cal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px}
+.month-title{font-size:20px;font-weight:750}
+.cal-controls{display:flex;gap:8px}
+.iconbtn{width:38px;height:38px;border:1px solid var(--line);border-radius:11px;background:#20242b;color:#e8e3d8}
+.todaybtn{padding:0 13px;width:auto;font-size:12px}
+
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.weekday{text-align:center;color:#777f89;font-size:11px;padding:6px 0;font-weight:700}
+.day{min-height:62px;border:1px solid transparent;border-radius:12px;background:#1b1e23;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;position:relative;color:#c9cbd0;transition:.18s}
+.day.blank{background:transparent}
+.day:not(.blank):hover{border-color:#75613d;background:#24272c}
+.day.selected{background:linear-gradient(135deg,#e2c68e,#b58d4f);color:#161513;font-weight:800;box-shadow:0 5px 20px #d7b77822}
+.day.today:not(.selected){border-color:#b99b61}
+.dots{display:flex;gap:3px;height:5px}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--gold)}
+.day.selected .dot{background:#252019}
+.daynum{font-size:13px}
+
+.calendar-footer{display:flex;justify-content:space-between;align-items:center;margin-top:13px;color:var(--muted);font-size:12px}
+.legend{display:flex;align-items:center;gap:6px}
+.legend .dot{display:inline-block}
+
+.bookings-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin:24px 0 14px}
+.bookings-head h2{font-size:21px;margin:0}
+.bookings-head p{color:var(--muted);font-size:12px;margin:5px 0 0}
+.clearfilter{color:var(--gold);border:0;background:transparent;font-size:12px}
+.booking-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+
+.card-wrap{perspective:1200px;min-height:300px}
+.booking-card{position:relative;width:100%;min-height:300px;transform-style:preserve-3d;transition:transform .72s cubic-bezier(.2,.7,.2,1);cursor:pointer}
+.booking-card.flipped{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:1px solid #30343b;border-radius:20px;overflow:hidden;background:linear-gradient(135deg,#1b1e23,#14161a);box-shadow:0 15px 35px #0003}
+.front{display:grid;grid-template-columns:38% 62%;min-height:300px}
+.photo{position:relative;background:#26292e;overflow:hidden}
+.photo img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.photo:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#0008,transparent 55%)}
+.datebadge{position:absolute;top:13px;left:13px;z-index:2;background:#e3c68d;color:#171513;border-radius:11px;padding:8px 9px;text-align:center;font-size:10px;font-weight:800;letter-spacing:1px}
+.datebadge strong{display:block;font-size:20px;line-height:1.2}
+.content{padding:17px;display:flex;flex-direction:column;gap:9px}
+.status{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--green);display:flex;align-items:center;gap:6px}
+.status.pending{color:var(--gold)}
+.status.cancelled{color:var(--red)}
+.customer{font-size:18px;font-weight:750;line-height:1.2}
+.eventtype{font-size:12px;color:var(--muted)}
+.service{display:inline-flex;align-self:flex-start;padding:6px 9px;border-radius:9px;background:#252930;color:#d9c08b;font-size:11px;border:1px solid #343941}
+.timing{font-size:12px;color:#c5c8ce}
+.moneyrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:auto}
+.money{padding:10px;background:#20242a;border:1px solid #2c3139;border-radius:12px}
+.money small{display:block;color:var(--muted);font-size:10px}
+.money strong{display:block;margin-top:5px;font-size:15px}
+.money.balance strong{color:var(--gold2)}
+.flip-hint{font-size:10px;color:#7e858f;text-align:right;margin-top:2px}
+.back{transform:rotateY(180deg);padding:18px;display:flex;flex-direction:column;gap:10px}
+.back-title{color:var(--gold2);font-size:12px;letter-spacing:1.6px;font-weight:800}
+.detail{display:flex;gap:9px;font-size:12px;color:#d3d5da;line-height:1.45}
+.detail .ico{width:17px;color:var(--gold);flex-shrink:0}
+.back-money{display:flex;justify-content:space-between;border-top:1px solid #333841;padding-top:10px;font-size:12px}
+.back-money strong{color:var(--gold2)}
+.notes{padding:9px 10px;border-radius:10px;background:#22262c;color:#b6bbc2;font-size:11px;min-height:32px}
+.back-foot{display:flex;justify-content:space-between;margin-top:auto;color:#777f89;font-size:10px}
+.empty{border:1px dashed #3a3f47;border-radius:18px;padding:35px;text-align:center;color:var(--muted);grid-column:1/-1}
+.empty-icon{font-size:32px;margin-bottom:10px}
+.modal-back{position:fixed;inset:0;background:#000a;backdrop-filter:blur(7px);display:none;align-items:center;justify-content:center;padding:16px;z-index:99}
+.modal-back.open{display:flex}
+.modal{width:min(680px,100%);max-height:92vh;overflow:auto;background:#171a1f;border:1px solid #373c44;border-radius:22px;padding:22px;box-shadow:0 30px 100px #0008}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.modal-head h2{margin:0;font-size:20px}
+.close{border:1px solid #353a42;background:#242830;color:#ddd;border-radius:10px;width:36px;height:36px}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field.full{grid-column:1/-1}
+.field label{font-size:11px;color:#9ba1aa}
+.field input,.field select,.field textarea{background:#22262c;border:1px solid #353b44;color:#eee;border-radius:10px;padding:11px;outline:none;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#b9975a}
+.field textarea{min-height:76px;resize:vertical}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);padding:12px 18px;background:#242930;border:1px solid #4a505a;border-radius:12px;color:#eee;z-index:120;display:none;box-shadow:0 12px 30px #0005}
+.toast.show{display:block}
+.loading{color:var(--muted);padding:20px;text-align:center}
+@media(max-width:800px){
+.stats{grid-template-columns:repeat(2,1fr)}
+.booking-grid{grid-template-columns:1fr}
+.hero{align-items:flex-start}
+.front{grid-template-columns:34% 66%}
+.content{padding:14px}
+.calendar-panel{padding:14px}
+.day{min-height:52px}
+.wrap{padding:16px 13px 50px}
+}
+@media(max-width:480px){
+.top{margin-bottom:18px}
+.brandname{font-size:19px}
+.subbrand{font-size:8px}
+.hero h1{font-size:29px}
+.hero p{font-size:12px}
+.primary{padding:10px 12px;font-size:12px}
+.stats{gap:8px}
+.stat{padding:12px}
+.stat-value{font-size:20px}
+.calendar-panel{padding:12px}
+.day{min-height:43px;border-radius:9px}
+.weekday{font-size:10px}
+.calendar{gap:4px}
+.month-title{font-size:17px}
+.front{grid-template-columns:33% 67%;min-height:285px}
+.card-wrap,.booking-card{min-height:285px}
+.content{padding:12px;gap:7px}
+.customer{font-size:16px}
+.money{padding:8px}
+.money strong{font-size:13px}
+.back{padding:14px}
+.formgrid{grid-template-columns:1fr}
+.field.full{grid-column:auto}
+.bookings-head h2{font-size:18px}
+}
+
+/* KEEVO CENTERED + COMPACT DASHBOARD */
+.top{justify-content:center;position:relative;margin:8px 0 16px}
+.brand{justify-content:center;text-align:center;flex-direction:column;gap:7px}
+.brandname{font-size:26px;letter-spacing:3px}
+.subbrand{font-size:10px;letter-spacing:2.2px}
+.mark{display:none}
+.top-actions{display:none!important}
+.hero{display:none!important}
+#newBtn{display:block;margin:0 auto 14px;padding:12px 23px;font-size:14px}
+.stats{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:0 0 14px}
+.stat{padding:9px 8px;border-radius:12px;text-align:center}
+.stat-label{font-size:9px;line-height:1.2;white-space:nowrap}
+.stat-value{font-size:15px;margin-top:4px}
+.calendar-panel{margin-top:0;padding:13px}
+.calendar-footer{display:none!important}
+.bookings-head{display:none!important}
+#bookingGrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+@media(max-width:480px){
+  .wrap{padding:14px 10px 40px}
+  .top{margin:4px 0 13px}
+  .brandname{font-size:24px}
+  .subbrand{font-size:9px}
+  #newBtn{margin-bottom:12px;padding:11px 20px}
+  .stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-bottom:12px}
+  .stat{padding:8px 4px;border-radius:10px}
+  .stat-label{font-size:8px}
+  .stat-value{font-size:13px;margin-top:3px}
+  .calendar-panel{padding:10px;border-radius:16px}
+  .cal-head{margin-bottom:10px}
+  .day{min-height:40px}
+  #bookingGrid{grid-template-columns:1fr}
+}
+.booking-actions{position:absolute;right:10px;top:10px;z-index:8}
+.booking-menu-btn{width:34px;height:34px;border-radius:50%;border:1px solid #454b55;background:#171a20;color:#f5f1e8;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.booking-menu{display:none;position:absolute;right:0;top:38px;width:158px;background:#191c21;border:1px solid #3d434d;border-radius:12px;padding:6px;box-shadow:0 12px 30px #0009;z-index:10}
+.booking-menu.open{display:block}
+.booking-menu button{display:block;width:100%;padding:10px;border:0;border-radius:8px;background:transparent;color:#f4f1ea;text-align:left;cursor:pointer;font-size:13px}
+.booking-menu button:hover{background:#292e36}
+.booking-menu button.delete-action{color:#ff8c8c}
+.profile-area{position:absolute;right:0;top:0;display:block}
+.profile-menu{display:none;position:absolute;right:0;top:48px;width:min(260px,80vw);padding:12px;background:#191c21;border:1px solid #393f47;border-radius:14px;z-index:80;box-shadow:0 15px 40px #0008;text-align:left}
+.profile-menu.open{display:block}
+.profile-email{font-size:12px;color:#c9cbd0;word-break:break-word;padding:4px 4px 10px;border-bottom:1px solid #333842;margin-bottom:8px}
+.profile-menu button{width:100%;text-align:left;background:#252930;color:#f4f1ea;border:1px solid #3b414a;border-radius:9px;padding:10px}
+@media(max-width:480px){.profile-area{right:2px}.avatar{width:34px;height:34px}}
+
+  /* KEEVO BUSINESS FOOTER */
+
+.keevo-footer{
+  margin:28px 0 0;
+  padding:18px 10px 8px;
+  border-top:1px solid #2b3038;
+  text-align:center;
+  color:#8f959e;
+}
+
+.footer-business{
+  font-size:13px;
+  color:#d7b778;
+  font-weight:700;
+  letter-spacing:.5px;
+  margin-bottom:5px;
+}
+
+.footer-brand{
+  font-size:10px;
+  letter-spacing:2px;
+  font-weight:800;
+  color:#777f89;
+}
+
+.footer-powered{
+  font-size:10px;
+  margin-top:6px;
+  color:#686f79;
+}
+
+/* KEEVO SIMPLE ELEGANT BUSINESS NAME FOOTER */
+
+.keevo-bottom-nav{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  z-index:70;
+  padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+  background:rgba(13,15,18,.94);
+  backdrop-filter:blur(14px);
+  border-top:1px solid #292d33;
+}
+
+.bottom-nav-business{
+  width:100%;
+  max-width:650px;
+  margin:0 auto;
+  min-height:48px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+
+  padding:10px 16px;
+
+  font-size:17px;
+  font-weight:700;
+  letter-spacing:.5px;
+
+  color:#e2c68e;
+
+  background:linear-gradient(
+    180deg,
+    #191b1f,
+    #111316
+  );
+
+  border:1px solid #9b8050;
+  border-radius:13px;
+
+  box-shadow:
+    0 0 12px rgba(215,183,120,.08),
+    inset 0 1px 0 rgba(255,255,255,.04);
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+body{
+  padding-bottom:82px;
+}
+
+.wrap{
+  padding-bottom:24px;
+}
+
+@media(max-width:480px){
+
+  .keevo-bottom-nav{
+    padding:9px 12px calc(9px + env(safe-area-inset-bottom));
+  }
+
+  .bottom-nav-business{
+    min-height:45px;
+    font-size:15px;
+    letter-spacing:.4px;
+    border-radius:11px;
+  }
+
+  body{
+    padding-bottom:76px;
+  }
+
+  .wrap{
+    padding-bottom:20px;
+  }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <div class="mark">K</div>
+      <div>
+        <div class="brandname">EVNTRS.IN</div>
+        <div class="subbrand">EVENT BOOKING STUDIO</div>
+      </div>
+    </div>
+    <div class="profile-area" id="profileArea">
+      <button class="avatar" id="profileBtn" type="button" aria-label="Account">U</button>
+      <div class="profile-menu" id="profileMenu">
+        <div class="profile-email" id="profileEmail">Loading account...</div>
+        <button type="button" id="logoutBtn">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <div style="text-align:center;margin-bottom:20px">
+    <button class="primary" id="newBtn">＋ New Booking</button>
+  </div>
+
+  <!-- COMPACT MONTHLY STATS -->
+  <section class="stats" id="dashboardSection">
+
+    <div class="stat">
+      <div class="stat-label">This Month</div>
+      <div class="stat-value" id="statBookings">0</div>
+    </div>
+
+    <div class="stat">
+            <div class="stat-label">Booking Value</div>
+      <div class="stat-value gold" id="statValue">₹0</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-label">Advance</div>
+      <div class="stat-value" id="statAdvance">₹0</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-label">Balance</div>
+      <div class="stat-value gold" id="statBalance">₹0</div>
+    </div>
+
+  </section>
+
+  <!-- CALENDAR -->
+  <section class="calendar-panel" id="calendarSection">
+
+    <div class="cal-head">
+      <div class="month-title" id="monthTitle"></div>
+
+      <div class="cal-controls">
+        <button class="iconbtn" id="prevMonth">‹</button>
+        <button class="iconbtn todaybtn" id="todayBtn">Today</button>
+        <button class="iconbtn" id="nextMonth">›</button>
+      </div>
+    </div>
+
+    <div class="calendar" id="calendar"></div>
+
+    <div class="calendar-footer" style="display:none">
+      <div class="legend">
+        <span class="dot"></span>
+        Booked dates
+      </div>
+      <span id="selectedLabel">Showing all dates</span>
+    </div>
+
+  </section>
+
+  <!-- BOOKINGS -->
+  <section class="bookings-head" style="display:none">
+    <div>
+      <h2 id="listTitle">All Booked Events</h2>
+      <p id="listSub">Current month</p>
+    </div>
+
+    <button class="clearfilter" id="clearFilter" style="display:none">
+      Show all dates ×
+    </button>
+  </section>
+
+  <div class="booking-grid" id="bookingGrid"></div>
+
+  <!-- KEEVO FIXED BUSINESS NAME BAR -->
+<nav class="keevo-bottom-nav" id="keevoBottomNav" aria-label="Registered business name">
+  <div class="bottom-nav-business" id="footerBusinessName"></div>
+</nav>
+
+</div>
+
+
+<!-- NEW BOOKING MODAL -->
+<div class="modal-back" id="modalBack">
+
+  <div class="modal">
+
+    <div class="modal-head">
+      <h2 id="modalTitle">New Event Booking</h2>
+      <button class="close" id="closeModal">×</button>
+          </div>
+
+    <form id="bookingForm">
+
+      <div class="formgrid">
+
+        <div class="field">
+          <label>Customer Name *</label>
+          <input name="customer_name" required placeholder="Customer full name">
+        </div>
+
+        <div class="field">
+          <label>Mobile Number</label>
+          <input name="customer_phone" inputmode="tel" placeholder="+91">
+        </div>
+
+        <div class="field">
+          <label>Event Type</label>
+          <input name="event_name" placeholder="Wedding / Birthday / Corporate">
+        </div>
+
+        <div class="field">
+          <label>Service</label>
+          <input name="service_name" placeholder="360 Video Booth">
+        </div>
+
+        <div class="field">
+          <label>Event Date *</label>
+          <input name="event_date" type="date" required>
+        </div>
+
+        <div class="field">
+          <label>Booking Status</label>
+
+          <select name="booking_status">
+            <option value="confirmed">Confirmed</option>
+            <option value="pending">Pending</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Start Time</label>
+          <input name="start_time" type="time">
+        </div>
+
+        <div class="field">
+          <label>End Time</label>
+          <input name="end_time" type="time">
+        </div>
+
+        <div class="field">
+          <label>Total Booking Amount (₹)</label>
+          <input name="booking_amount" type="number" min="0" step="0.01" value="0">
+        </div>
+
+        <div class="field">
+          <label>Advance Received (₹)</label>
+          <input name="advance_paid" type="number" min="0" step="0.01" value="0">
+        </div>
+
+        <div class="field">
+          <label>Venue Name</label>
+          <input name="venue_name" placeholder="Hall / venue">
+        </div>
+
+        <div class="field full">
+          <label>Event Photo</label>
+          <input type="file" id="eventPhotoInput" accept="image/*" hidden>
+          <button type="button" class="ghost" id="choosePhotoBtn">🖼️ Choose Photo from Gallery</button>
+          <div id="photoPreviewBox" style="display:none;margin-top:10px">
+            <img id="photoPreview" alt="Selected event photo preview" style="width:100%;max-height:220px;object-fit:cover;border-radius:12px;border:1px solid #353b44">
+            <div id="photoInfo" style="font-size:11px;color:#9ba1aa;margin-top:7px"></div>
+            <button type="button" class="ghost" id="removePhotoBtn" style="margin-top:8px">✕ Remove Photo</button>
+          </div>
+        </div>
+
+        <div class="field full">
+          <label>Full Address</label>
+          <textarea name="event_address" placeholder="Event venue address"></textarea>
+        </div>
+
+        <div class="field full">
+          <label>Notes</label>
+          <textarea name="notes" placeholder="Setup instructions, requirements, etc."></textarea>
+        </div>
+
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="ghost" id="cancelModal">Cancel</button>
+        <button type="submit" class="primary" id="saveBtn">Save Booking</button>
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+
+const SUPABASE_URL = "https://erbxsghhlnsqodwnalfk.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_DkgXw6CYjzEOmNFZ09r3FQ_85lp2B-c";
+
+const sb = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+let currentUser = null;
+let bookings = [];
+let services = [];
+
+let currentMonth = new Date();
+
+currentMonth = new Date(
+  currentMonth.getFullYear(),
+  currentMonth.getMonth(),
+  1
+);
+
+let selectedDate = null;
+let editingBookingId = null;
+let editingPhotoUrl = null;
+let removeExistingPhoto = false;
+
+const $ = (id) => document.getElementById(id);
+
+const fmtMoney = n =>
+  new Intl.NumberFormat('en-IN',{
+    style:'currency',
+    currency:'INR',
+    maximumFractionDigits:0
+  }).format(Number(n||0));
+
+const fmtDate = d =>
+  new Date(d+'T00:00:00').toLocaleDateString('en-IN',{
+    day:'2-digit',
+    month:'short',
+    year:'numeric'
+  });
+
+const timeFmt = t => {
+  if(!t)return '';
+
+  let [h,m]=t.split(':');
+
+  let date=new Date();
+
+  date.setHours(+h,+m);
+
+  return date.toLocaleTimeString('en-IN',{
+    hour:'numeric',
+    minute:'2-digit'
+  });
+};
+
+const escapeHtml = s =>
+  String(s??'').replace(/[&<>"']/g,c=>({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[c]));
+function toast(msg){
+
+  $('toast').textContent=msg;
+
+  $('toast').classList.add('show');
+
+  setTimeout(()=>{
+    $('toast').classList.remove('show');
+  },3000);
+}
+
+
+// EVENT PHOTO GALLERY, PREVIEW AND COMPRESSION
+let compressedEventPhoto = null;
+let photoPreviewObjectURL = null;
+
+const photoInput = $('eventPhotoInput');
+const choosePhotoBtn = $('choosePhotoBtn');
+const photoPreviewBox = $('photoPreviewBox');
+const photoPreview = $('photoPreview');
+const photoInfo = $('photoInfo');
+const removePhotoBtn = $('removePhotoBtn');
+
+choosePhotoBtn.onclick = () => photoInput.click();
+
+photoInput.addEventListener('change', async function(){
+  const file=this.files && this.files[0];
+  if(!file) return;
+  if(!file.type.startsWith('image/')){
+    toast('Please select an image file');
+    this.value='';
+    return;
+  }
+  choosePhotoBtn.disabled=true;
+  choosePhotoBtn.textContent='Compressing photo...';
+  try{
+    compressedEventPhoto=await compressEventImage(file);
+    if(photoPreviewObjectURL) URL.revokeObjectURL(photoPreviewObjectURL);
+    photoPreviewObjectURL=URL.createObjectURL(compressedEventPhoto);
+    photoPreview.src=photoPreviewObjectURL;
+    photoPreviewBox.style.display='block';
+    photoInfo.textContent='Compressed size: '+(compressedEventPhoto.size/1024/1024).toFixed(2)+' MB';
+    choosePhotoBtn.textContent='✓ Photo Selected — Change Photo';
+  }catch(err){
+    console.error('Image compression error:',err);
+    compressedEventPhoto=null;
+    toast('Could not process photo. Please try another image.');
+    choosePhotoBtn.textContent='🖼️ Choose Photo from Gallery';
+  }finally{
+    choosePhotoBtn.disabled=false;
+  }
+});
+
+removePhotoBtn.onclick=()=>{
+  if(editingBookingId) removeExistingPhoto=true;
+  compressedEventPhoto=null;
+  photoInput.value='';
+  photoPreviewBox.style.display='none';
+  photoPreview.removeAttribute('src');
+  photoInfo.textContent='';
+  if(photoPreviewObjectURL){URL.revokeObjectURL(photoPreviewObjectURL);photoPreviewObjectURL=null;}
+  choosePhotoBtn.textContent='🖼️ Choose Photo from Gallery';
+};
+
+async function compressEventImage(file){
+  const image=new Image();
+  const sourceURL=URL.createObjectURL(file);
+  try{
+    await new Promise((resolve,reject)=>{image.onload=resolve;image.onerror=reject;image.src=sourceURL;});
+    let width=image.naturalWidth||image.width;
+    let height=image.naturalHeight||image.height;
+    const maxDimension=1600;
+    if(width>maxDimension||height>maxDimension){
+      const ratio=Math.min(maxDimension/width,maxDimension/height);
+      width=Math.round(width*ratio);height=Math.round(height*ratio);
+    }
+    const canvas=document.createElement('canvas');
+    const ctx=canvas.getContext('2d');
+    let blob=null;
+    for(let attempt=0;attempt<8;attempt++){
+      canvas.width=width;canvas.height=height;
+      ctx.drawImage(image,0,0,width,height);
+      const quality=Math.max(0.45,0.82-attempt*0.06);
+      blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',quality));
+      if(blob && blob.size<=1024*1024) break;
+      if(attempt>=3){width=Math.round(width*0.82);height=Math.round(height*0.82);}
+    }
+    if(!blob) throw new Error('Canvas compression failed');
+    if(blob.size>1024*1024) throw new Error('Unable to compress below 1 MB');
+    return new File([blob],`event-${Date.now()}.jpg`,{type:'image/jpeg',lastModified:Date.now()});
+  }finally{URL.revokeObjectURL(sourceURL);}
+}
+
+async function uploadEventPhoto(file){
+  if(!file||!currentUser) return null;
+  const path=`${currentUser.id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+  const {data,error}=await sb.storage.from('event-photos').upload(path,file,{cacheControl:'3600',upsert:false,contentType:'image/jpeg'});
+  if(error) throw error;
+  const {data:publicURL}=sb.storage.from('event-photos').getPublicUrl(data.path);
+  return publicURL.publicUrl;
+}
+
+function monthKey(d){
+  return d.slice(0,7);
+}
+
+function statusLabel(s){
+
+  return s==='confirmed'
+    ?'Confirmed'
+    :s==='pending'
+    ?'Pending'
+    :s==='completed'
+    ?'Completed'
+    :'Cancelled';
+}
+
+function statusClass(s){
+
+  return s==='pending'
+    ?'pending'
+    :s==='cancelled'
+    ?'cancelled'
+    :'';
+}
+
+
+// INITIALIZE + AUTHENTICATION
+
+async function init(){
+  const {data:{session},error:sessionError}=await sb.auth.getSession();
+
+  if(sessionError){
+    console.error('Session check error:',sessionError);
+    toast('Unable to check login session');
+  }
+
+  if(!session){
+    window.location.replace('login.html');
+    return;
+  }
+
+  currentUser=session.user;
+  updateProfileUI();
+
+  // Footer fetch runs independently; dashboard does not wait for it.
+  loadBusinessFooter();
+
+  await loadBookings();
+  renderAll();
+}
+
+// LOAD BOOKINGS
+async function loadBookings(){
+  if(!currentUser) return;
+
+  const {data,error}=await sb
+    .from('bookings')
+    .select('*')
+    .eq('user_id',currentUser.id)
+    .order('event_date',{ascending:true});
+
+  if(error){
+    console.error('Load bookings error:',error);
+    toast('Could not load bookings. Check Supabase permissions.');
+    bookings=[];
+    return;
+  }
+
+  bookings=data||[];
+}
+
+// LOAD REGISTERED BUSINESS NAME IN FOOTER
+async function loadBusinessFooter(){
+  if(!currentUser) return;
+
+  const footerEl=$('footerBusinessName');
+  if(!footerEl) return;
+
+  const fallback=currentUser.user_metadata?.business_name||'';
+  footerEl.textContent=fallback;
+
+  try{
+    const {data,error}=await sb
+      .from('profiles')
+      .select('business_name')
+      .eq('id',currentUser.id)
+      .maybeSingle();
+
+    if(error){
+      console.warn('Footer business name fetch error:',error.message);
+      return;
+    }
+
+    if(data?.business_name){
+      footerEl.textContent=data.business_name;
+    }
+  }catch(err){
+    console.warn('Footer business name unexpected error:',err);
+  }
+}
+
+function updateProfileUI(){
+
+  if(!currentUser)return;
+
+  const email=currentUser.email||'Logged in user';
+
+  $('profileEmail').textContent=email;
+
+  $('profileBtn').textContent=(email.charAt(0)||'U').toUpperCase();
+}
+
+$('profileBtn').onclick=()=>
+  $('profileMenu').classList.toggle('open');
+
+document.addEventListener('click',e=>{
+
+  if(!$('profileArea').contains(e.target)){
+    $('profileMenu').classList.remove('open');
+  }
+});
+
+$('logoutBtn').onclick=async()=>{
+
+  const {error}=await sb.auth.signOut();
+
+  if(error){
+    toast('Logout failed: '+error.message);
+    return;
+  }
+
+  window.location.replace('login.html');
+};
+
+
+// IMPORTANT: all three functions run
+
+function renderAll(){
+
+  renderStats();
+
+  renderCalendar();
+
+  renderBookings();
+}
+
+
+// CALENDAR
+
+function renderCalendar(){
+    const year=currentMonth.getFullYear();
+
+  const month=currentMonth.getMonth();
+
+  $('monthTitle').textContent=
+    currentMonth.toLocaleDateString('en-IN',{
+      month:'long',
+      year:'numeric'
+    });
+
+  const first=new Date(year,month,1).getDay();
+
+  const days=new Date(year,month+1,0).getDate();
+
+  const bookedDates=new Set(
+    bookings
+      .filter(
+        b=>monthKey(b.event_date)===
+        `${year}-${String(month+1).padStart(2,'0')}`
+      )
+      .map(b=>b.event_date)
+  );
+
+  const today=new Date();
+
+  const todayStr=
+    `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+  let html=[
+    'Sun','Mon','Tue','Wed','Thu','Fri','Sat'
+  ].map(d=>`<div class="weekday">${d}</div>`).join('');
+    // Empty cells before first day
+  for(let i=0;i<first;i++){
+
+    html+='<div class="day blank"></div>';
+  }
+
+  // Dates
+  for(let d=1;d<=days;d++){
+
+    let date=
+      `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+
+    const booked=bookedDates.has(date);
+
+    const sel=selectedDate===date;
+
+    const todayClass=date===todayStr?'today':'';
+
+    html+=`
+      <button class="day ${sel?'selected':''} ${todayClass}" data-date="${date}">
+        <span class="daynum">${d}</span>
+        ${
+          booked
+          ?'<span class="dots"><span class="dot"></span></span>'
+          :'<span class="dots"></span>'
+        }
+      </button>
+    `;
+  }
+
+  $('calendar').innerHTML=html;
+
+  // Date selection
+  $('calendar')
+    .querySelectorAll('[data-date]')
+    .forEach(btn=>{
+
+      btn.onclick=()=>{
+
+        selectedDate=
+          selectedDate===btn.dataset.date
+          ?null
+          :btn.dataset.date;
+
+        renderAll();
+      };
+    });
+
+  $('selectedLabel').textContent=
+    selectedDate
+    ?fmtDate(selectedDate)
+    :'Showing all dates';
+}
+
+
+// MONTHLY STATS
+
+function renderStats(){
+
+  const month=
+    `${currentMonth.getFullYear()}-${String(currentMonth.getMonth()+1).padStart(2,'0')}`;
+
+  const monthBookings=bookings.filter(
+    b=>monthKey(b.event_date)===month &&
+       b.booking_status!=='cancelled'
+  );
+
+  // Booking count
+  $('statBookings').textContent=
+    monthBookings.length;
+
+  // Total booking amount
+  $('statValue').textContent=
+    fmtMoney(
+      monthBookings.reduce(
+        (a,b)=>a+Number(b.booking_amount||0),
+        0
+      )
+    );
+
+  // Advance received
+  $('statAdvance').textContent=
+    fmtMoney(
+      monthBookings.reduce(
+        (a,b)=>a+Number(b.advance_paid||0),
+        0
+      )
+    );
+
+  // Balance
+  $('statBalance').textContent=
+    fmtMoney(
+      monthBookings.reduce(
+        (a,b)=>a+Number(b.balance_due||0),
+        0
+      )
+    );
+}
+
+
+// BOOKING LIST
+
+function renderBookings(){
+
+  const month=
+    `${currentMonth.getFullYear()}-${String(currentMonth.getMonth()+1).padStart(2,'0')}`;
+
+  let filtered=bookings.filter(
+    b=>monthKey(b.event_date)===month
+  );
+
+  // Selected date filter
+  if(selectedDate){
+
+    filtered=filtered.filter(
+      b=>b.event_date===selectedDate
+    );
+  }
+
+  $('listTitle').textContent=
+    selectedDate
+    ?'Bookings · '+fmtDate(selectedDate)
+    :'All Booked Events';
+
+  $('listSub').textContent=
+    selectedDate
+    ?'Only events booked on selected date'
+    :currentMonth.toLocaleDateString('en-IN',{
+       month:'long',
+       year:'numeric'
+     })+' · Sorted by event date';
+
+  // No bookings
+  if(!filtered.length){
+
+    $('bookingGrid').innerHTML=`
+      <div class="empty">
+        <div class="empty-icon">✦</div>
+
+        <strong>
+          ${
+            selectedDate
+            ?'No bookings for this date'
+            :'No bookings this month'
+          }
+        </strong>
+
+        <div style="margin-top:7px">
+          Create your first booking using the New Booking button.
+        </div>
+      </div>
+    `;
+
+    return;
+  }
+
+  // Display booking cards
+  $('bookingGrid').innerHTML=
+    filtered.map(b=>cardHTML(b)).join('');
+
+  // Flip cards
+  $('bookingGrid')
+    .querySelectorAll('.booking-card')
+    .forEach(card=>{
+
+      card.addEventListener('click',()=>{
+        card.classList.toggle('flipped');
+      });
+    });
+}
+
+
+// BOOKING CARD
+
+function cardHTML(b){
+
+  const date=new Date(
+    b.event_date+'T00:00:00'
+  );
+
+  const day=date.getDate();
+
+  const mon=date.toLocaleDateString(
+    'en-IN',
+    {month:'short'}
+  ).toUpperCase();
+
+  const photo=
+    b.event_photo_url ||
+    fallbackPhoto(b.event_name||b.service_name||'event');
+
+  const time=[
+    b.start_time?timeFmt(b.start_time):'',
+    b.end_time?timeFmt(b.end_time):''
+  ].filter(Boolean).join(' – ');
+
+  const balance = Number(
+  b.balance_due ??
+  (
+    Number(b.booking_amount || 0) -
+    Number(b.advance_paid || 0)
+  )
+);
+
+  return `
+
+  <div class="card-wrap">
+
+    <div class="booking-actions">
+      <button class="booking-menu-btn" type="button" aria-label="Booking actions" onclick="event.stopPropagation();this.nextElementSibling.classList.toggle('open')">⋮</button>
+      <div class="booking-menu">
+        <button type="button" onclick="event.stopPropagation();this.closest('.card-wrap').querySelector('.booking-menu').classList.remove('open');editBooking('${String(b.id).replace(/'/g, '')}')">✎ Edit Booking</button>
+        <button type="button" class="delete-action" onclick="event.stopPropagation();this.closest('.card-wrap').querySelector('.booking-menu').classList.remove('open');deleteBooking('${String(b.id).replace(/'/g, '')}')">🗑 Delete Booking</button>
+      </div>
+    </div>
+
+    <div class="booking-card">
+
+      <!-- FRONT -->
+      <div class="face front">
+
+        <div class="photo">
+
+          <img
+            src="${escapeHtml(photo)}"
+            alt=""
+            onerror="this.src='${fallbackPhoto('event')}'"
+          >
+
+          <div class="datebadge">
+            <strong>${day}</strong>
+            ${mon}
+          </div>
+
+        </div>
+
+        <div class="content">
+
+          <div class="status ${statusClass(b.booking_status)}">
+            <span>●</span>
+            ${statusLabel(b.booking_status)}
+          </div>
+
+          <div class="customer">
+            ${escapeHtml(b.customer_name)}
+          </div>
+
+          <div class="eventtype">
+            ${escapeHtml(b.event_name||'Event')}
+          </div>
+
+          <div class="service">
+            ${escapeHtml(b.service_name||'Service')}
+          </div>
+
+          <div class="timing">
+            ${
+              time
+              ?'◷ '+escapeHtml(time)
+              :'Time not set'
+            }
+          </div>
+
+          <div class="moneyrow">
+
+            <div class="money">
+              <small>Total</small>
+              <strong>
+                ${fmtMoney(b.booking_amount)}
+              </strong>
+            </div>
+
+            <div class="money balance">
+              <small>Balance</small>
+              <strong>
+                ${fmtMoney(balance)}
+              </strong>
+            </div>
+
+          </div>
+
+          <div class="flip-hint">
+            ↻ Tap card to flip
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- BACK -->
+      <div class="face back">
+
+        <div class="back-title">
+          BOOKING DETAILS
+        </div>
+
+        <div class="detail">
+          <span class="ico">☎</span>
+          <span>
+            ${escapeHtml(b.customer_phone||'Phone not added')}
+                      </span>
+        </div>
+
+        <div class="detail">
+          <span class="ico">⌖</span>
+          <span>
+            ${escapeHtml(b.venue_name||'Venue not added')}
+            ${
+              b.event_address
+              ?'<br>'+escapeHtml(b.event_address)
+              :''
+            }
+          </span>
+        </div>
+
+        <div class="detail">
+          <span class="ico">◷</span>
+          <span>
+            ${escapeHtml(time||'Time not set')}
+          </span>
+        </div>
+
+        <div class="detail">
+          <span class="ico">✦</span>
+          <span>
+            ${escapeHtml(b.service_name||'Service not specified')}
+          </span>
+        </div>
+
+        <div class="back-money">
+          <span>Total Amount</span>
+          <strong>
+            ${fmtMoney(b.booking_amount)}
+          </strong>
+        </div>
+
+        <div class="back-money">
+          <span>Advance Received</span>
+          <strong>
+            ${fmtMoney(b.advance_paid)}
+          </strong>
+        </div>
+
+        <div class="back-money">
+          <span>Balance to Collect</span>
+          <strong>
+            ${fmtMoney(balance)}
+          </strong>
+        </div>
+
+        <div class="notes">
+          ${escapeHtml(b.notes||'No additional notes')}
+        </div>
+
+        <div class="back-foot">
+          <span>↻ Tap to return</span>
+          <span>${statusLabel(b.booking_status)}</span>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  `;
+}
+
+
+// DEFAULT EVENT PHOTO
+
+function fallbackPhoto(query){
+
+  return `https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=600&q=80`;
+}
+
+
+// MONTH NAVIGATION
+
+$('prevMonth').onclick=()=>{
+
+  currentMonth=new Date(
+    currentMonth.getFullYear(),
+    currentMonth.getMonth()-1,
+    1
+  );
+
+  selectedDate=null;
+
+  renderAll();
+};
+
+
+$('nextMonth').onclick=()=>{
+
+  currentMonth=new Date(
+    currentMonth.getFullYear(),
+    currentMonth.getMonth()+1,
+    1
+  );
+
+  selectedDate=null;
+
+  renderAll();
+};
+
+
+$('todayBtn').onclick=()=>{
+
+  let t=new Date();
+
+  currentMonth=new Date(
+    t.getFullYear(),
+    t.getMonth(),
+    1
+  );
+
+  selectedDate=null;
+
+  renderAll();
+};
+
+
+// OPEN BOOKING MODAL
+
+function openModal(){
+
+  editingBookingId=null;
+  editingPhotoUrl=null;
+  removeExistingPhoto=false;
+    $('modalTitle').textContent='New Event Booking';
+  $('saveBtn').textContent='Save Booking';
+  $('modalBack').classList.add('open');
+
+  $('bookingForm').reset();
+
+  removePhotoBtn.onclick();
+
+  $('bookingForm').elements.booking_amount.value=0;
+
+  $('bookingForm').elements.advance_paid.value=0;
+
+  if(selectedDate){
+
+    $('bookingForm').elements.event_date.value=
+      selectedDate;
+
+  }else{
+
+    const today=new Date();
+
+    $('bookingForm').elements.event_date.value=
+      `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+  }
+}
+
+
+// EDIT / DELETE BOOKING ACTIONS
+function editBooking(id){
+  const b=bookings.find(x=>String(x.id)===String(id));
+  if(!b)return;
+  editingBookingId=b.id;
+  editingPhotoUrl=b.event_photo_url||null;
+  removeExistingPhoto=false;
+  $('bookingForm').reset();
+  compressedEventPhoto=null;
+  photoInput.value='';
+  if(photoPreviewObjectURL){URL.revokeObjectURL(photoPreviewObjectURL);photoPreviewObjectURL=null;}
+  photoPreviewBox.style.display='none';
+  photoPreview.removeAttribute('src');
+  photoInfo.textContent='';
+  choosePhotoBtn.textContent='🖼️ Choose Photo from Gallery';
+  const form=$('bookingForm').elements;
+  ['customer_name','customer_phone','event_name','service_name','event_date','start_time','end_time','booking_status','booking_amount','advance_paid','venue_name','event_address','notes'].forEach(k=>{if(form[k])form[k].value=b[k]??'';});
+  if(b.event_photo_url){photoPreview.src=b.event_photo_url;photoPreviewBox.style.display='block';photoInfo.textContent='Current booking photo';choosePhotoBtn.textContent='✓ Current Photo — Change Photo';}
+  $('modalTitle').textContent='Edit Booking';
+  $('saveBtn').textContent='Save Changes';
+  $('modalBack').classList.add('open');
+}
+
+async function deleteBooking(id){
+  const b=bookings.find(x=>String(x.id)===String(id));
+  if(!b)return;
+  if(!confirm(`Delete booking for ${b.customer_name||'this customer'}?\n\nThis action cannot be undone.`))return;
+  const {error}=await sb.from('bookings').delete().eq('id',id).eq('user_id',currentUser.id);
+  if(error){console.error(error);toast('Delete failed: '+error.message);return;}
+  bookings=bookings.filter(x=>String(x.id)!==String(id));
+  renderAll();
+  toast('Booking deleted');
+}
+
+// CLOSE MODAL
+
+function closeModal(){
+  $('modalBack').classList.remove('open');
+  editingBookingId=null;
+  editingPhotoUrl=null;
+  removeExistingPhoto=false;
+}
+
+$('newBtn').onclick=openModal;
+
+$('closeModal').onclick=closeModal;
+
+$('cancelModal').onclick=closeModal;
+
+$('modalBack').addEventListener('click',e=>{
+
+  if(e.target===$('modalBack')){
+
+    closeModal();
+  }
+});
+
+
+// SAVE BOOKING
+
+$('bookingForm').addEventListener('submit',async e=>{
+
+  e.preventDefault();
+
+  if(!currentUser){
+    toast('Please login again');
+    window.location.replace('login.html');
+    return;
+  }
+
+  const f=new FormData(e.target);
+
+  const amount=
+    Number(f.get('booking_amount')||0);
+
+  const advance=
+    Number(f.get('advance_paid')||0);
+
+  // Advance validation
+  if(advance>amount){
+
+    toast('Advance cannot be more than total amount');
+
+    return;
+  }
+
+  const payload={
+
+    user_id:currentUser.id,
+
+    customer_name:
+      f.get('customer_name').trim(),
+
+    customer_phone:
+      f.get('customer_phone')||null,
+
+    event_name:
+      f.get('event_name')||null,
+
+    service_name:
+      f.get('service_name')||null,
+
+    event_date:
+      f.get('event_date'),
+
+    start_time:
+      f.get('start_time')||null,
+
+    end_time:
+      f.get('end_time')||null,
+
+    venue_name:
+      f.get('venue_name')||null,
+
+    event_address:
+      f.get('event_address')||null,
+
+    booking_amount:
+      amount,
+
+    advance_paid:
+      advance,
+
+    balance_due:
+      amount-advance,
+
+    booking_status:
+      f.get('booking_status'),
+
+    event_photo_url:editingBookingId ? (removeExistingPhoto ? null : editingPhotoUrl) : null,
+
+    notes:
+      f.get('notes')||null
+  };
+
+
+  // Upload the compressed gallery photo first, then save booking
+  $('saveBtn').disabled=true;
+  $('saveBtn').textContent='Uploading photo & saving...';
+
+  let data=null;
+  let error=null;
+  try{
+    if(compressedEventPhoto){
+      payload.event_photo_url=await uploadEventPhoto(compressedEventPhoto);
+    }
+    let result;
+    if(editingBookingId){
+      const updatePayload={...payload};
+      delete updatePayload.user_id;
+      result=await sb.from('bookings').update(updatePayload).eq('id',editingBookingId).eq('user_id',currentUser.id).select().single();
+    }else{
+      result=await sb.from('bookings').insert(payload).select().single();
+    }
+    data=result.data;
+    error=result.error;
+    if(error) throw error;
+  }catch(err){
+    console.error('Save booking error:',err);
+    toast('Save failed: '+(err.message||'Please try again'));
+    $('saveBtn').disabled=false;
+    $('saveBtn').textContent=editingBookingId?'Save Changes':'Save Booking';
+    return;
+  }
+  $('saveBtn').disabled=false;
+  $('saveBtn').textContent='Save Booking';
+
+  if(editingBookingId){
+    bookings=bookings.map(b=>String(b.id)===String(editingBookingId)?data:b);
+  }else{
+    bookings.push(data);
+  }
+  const wasEditing=!!editingBookingId;
+  closeModal();
+
+  toast(wasEditing?'Booking updated successfully':'Booking saved successfully');
+
+
+  // Automatically show the newly booked date
+  currentMonth=new Date(
+    payload.event_date+'T00:00:00'
+  );
+
+  currentMonth=new Date(
+    currentMonth.getFullYear(),
+    currentMonth.getMonth(),
+    1
+  );
+
+  selectedDate=payload.event_date;
+
+  renderAll();
+
+});
+
+
+
+// Fixed bottom bar is display-only; no navigation actions.
+
+// START APP
+
+init();
+
+</script>
+
+</body>
+</html>

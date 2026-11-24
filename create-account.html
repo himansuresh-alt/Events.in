@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EVNTR | Create Account</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+:root{
+  --bg:#090a0c;
+  --panel:#121417;
+  --panel2:#181a1e;
+  --border:#292c32;
+  --gold:#d8b36d;
+  --gold2:#b99454;
+  --white:#f5f4f0;
+  --muted:#92969f;
+  --danger:#ff7777;
+  --success:#82d7a6;
+}
+
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(
+      circle at 85% 5%,
+      rgba(216,179,109,.10),
+      transparent 35%
+    ),
+    radial-gradient(
+      circle at 10% 90%,
+      rgba(216,179,109,.04),
+      transparent 30%
+    ),
+    var(--bg);
+  color:var(--white);
+  font-family:'DM Sans',sans-serif;
+}
+
+button,input{
+  font-family:inherit;
+}
+
+.page{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:30px 18px;
+}
+
+.container{
+  width:100%;
+  max-width:480px;
+}
+
+/* BRAND */
+
+.brand{
+  text-align:center;
+  margin-bottom:28px;
+}
+
+.logo{
+  width:54px;
+  height:54px;
+  border-radius:17px;
+  margin:0 auto 15px;
+  background:linear-gradient(
+    135deg,
+    #e5c887,
+    #b28a4d
+  );
+  color:#17130c;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'Manrope',sans-serif;
+  font-size:25px;
+  font-weight:900;
+  box-shadow:0 10px 35px rgba(216,179,109,.15);
+}
+
+.brandname{
+  font-family:'Manrope',sans-serif;
+  font-size:28px;
+  font-weight:800;
+  letter-spacing:4px;
+}
+
+.brand-sub{
+  color:var(--muted);
+  font-size:10px;
+  letter-spacing:4px;
+  margin-top:6px;
+}
+
+/* CARD */
+
+.card{
+  background:rgba(18,20,23,.96);
+  border:1px solid var(--border);
+  border-radius:25px;
+  padding:30px 25px;
+  box-shadow:0 25px 80px rgba(0,0,0,.35);
+}
+
+.heading{
+  margin-bottom:26px;
+}
+
+.heading h1{
+  font-family:'Manrope',sans-serif;
+  font-size:25px;
+  font-weight:800;
+  letter-spacing:-.5px;
+}
+
+.heading p{
+  color:var(--muted);
+  font-size:13px;
+  margin-top:8px;
+  line-height:1.6;
+}
+
+.goldline{
+  width:38px;
+  height:3px;
+  border-radius:10px;
+  background:var(--gold);
+  margin-top:15px;
+}
+
+/* FORM */
+
+.form{
+  display:flex;
+  flex-direction:column;
+  gap:17px;
+}
+
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.field label{
+  font-size:12px;
+  color:#c8c9cc;
+  font-weight:600;
+}
+
+.input-wrap{
+  position:relative;
+}
+
+.field input{
+  width:100%;
+  height:51px;
+  padding:0 15px;
+  background:#0c0e11;
+  border:1px solid #2a2d33;
+  border-radius:13px;
+  color:#fff;
+  outline:none;
+  font-size:14px;
+  transition:.2s;
+}
+
+.field input::placeholder{
+  color:#626670;
+}
+
+.field input:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(216,179,109,.08);
+}
+  /* PASSWORD */
+
+.password-input{
+  padding-right:65px !important;
+}
+
+.showpass{
+  position:absolute;
+  right:13px;
+  top:50%;
+  transform:translateY(-50%);
+  border:none;
+  background:transparent;
+  color:var(--gold);
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+/* PASSWORD HINT */
+
+.password-hint{
+  font-size:10px;
+  color:#777d86;
+  margin-top:2px;
+}
+
+/* BUTTON */
+
+.submit-btn{
+  width:100%;
+  height:53px;
+  border:0;
+  border-radius:14px;
+  margin-top:7px;
+  background:linear-gradient(
+    135deg,
+    #e1c17f,
+    #bd9658
+  );
+  color:#17130c;
+  font-size:14px;
+  font-weight:800;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.submit-btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 12px 25px rgba(216,179,109,.15);
+}
+
+.submit-btn:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+  transform:none;
+}
+
+/* MESSAGE */
+
+.message{
+  display:none;
+  padding:13px 14px;
+  border-radius:12px;
+  font-size:12px;
+  line-height:1.6;
+  margin-bottom:18px;
+}
+
+.message.show{
+  display:block;
+}
+
+.message.error{
+  background:rgba(255,100,100,.08);
+  border:1px solid rgba(255,100,100,.2);
+  color:#ff9292;
+}
+
+.message.success{
+  background:rgba(100,220,150,.08);
+  border:1px solid rgba(100,220,150,.2);
+  color:#9ce2b6;
+}
+
+/* FOOTER */
+
+.footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:12px;
+  margin-top:23px;
+}
+
+.footer a{
+  color:var(--gold);
+  text-decoration:none;
+  font-weight:700;
+}
+
+.bottom-note{
+  text-align:center;
+  color:#626670;
+  font-size:10px;
+  margin-top:23px;
+  letter-spacing:.5px;
+}
+
+/* LOADING */
+
+.loader{
+  display:inline-block;
+  width:15px;
+  height:15px;
+  border:2px solid rgba(0,0,0,.2);
+  border-top-color:#17130c;
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+  vertical-align:middle;
+  margin-right:7px;
+}
+
+@keyframes spin{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
+/* RESPONSIVE */
+
+@media(max-width:480px){
+
+  .page{
+    padding:22px 14px;
+    align-items:flex-start;
+  }
+
+  .container{
+    margin:auto 0;
+  }
+
+  .brand{
+    margin-bottom:23px;
+  }
+
+  .card{
+    padding:25px 19px;
+    border-radius:22px;
+  }
+
+  .heading h1{
+    font-size:23px;
+  }
+
+  .field input{
+    height:49px;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+<div class="container">
+
+<!-- BRAND -->
+
+<div class="brand">
+
+  <div class="logo">K</div>
+
+  <div class="brandname">EVNTR</div>
+
+  <div class="brand-sub">
+    EVENT BOOKING STUDIO
+  </div>
+
+</div>
+
+
+<!-- ACCOUNT CARD -->
+
+<div class="card">
+
+  <div class="heading">
+
+    <h1>Create your account</h1>
+
+    <p>
+      Manage your event bookings in one place.
+      Create your EVNTR account to get started.
+    </p>
+
+    <div class="goldline"></div>
+
+  </div>
+
+
+  <!-- MESSAGE -->
+
+  <div id="message" class="message"></div>
+
+
+  <!-- SIGNUP FORM -->
+
+  <form id="signupForm" class="form">
+
+    <!-- USERNAME -->
+
+    <div class="field">
+
+      <label for="username">
+        Username
+      </label>
+
+      <input
+        type="text"
+        id="username"
+        name="username"
+        placeholder="Choose a username"
+        autocomplete="username"
+        required
+        minlength="3"
+        maxlength="30"
+      >
+
+    </div>
+
+
+    <!-- BUSINESS NAME -->
+
+    <div class="field">
+
+      <label for="businessName">
+        Business Name
+      </label>
+
+      <input
+        type="text"
+        id="businessName"
+        name="businessName"
+        placeholder="Your business name"
+        autocomplete="organization"
+        required
+        maxlength="100"
+      >
+
+    </div>
+
+
+    <!-- MOBILE -->
+
+    <div class="field">
+
+      <label for="mobile">
+        Mobile Number
+      </label>
+
+      <input
+        type="tel"
+        id="mobile"
+        name="mobile"
+        placeholder="Enter mobile number"
+        autocomplete="tel"
+        inputmode="tel"
+        required
+        maxlength="15"
+      >
+
+    </div>
+
+
+    <!-- EMAIL -->
+
+    <div class="field">
+
+      <label for="email">
+        Email Address
+      </label>
+
+      <input
+        type="email"
+        id="email"
+        name="email"
+        placeholder="you@example.com"
+        autocomplete="email"
+        required
+      >
+
+    </div>
+
+
+    <!-- PASSWORD -->
+
+    <div class="field">
+
+      <label for="password">
+        Create Password
+      </label>
+
+      <div class="input-wrap">
+
+        <input
+          type="password"
+          id="password"
+          name="password"
+          class="password-input"
+          placeholder="Create a password"
+          autocomplete="new-password"
+          minlength="8"
+          required
+        >
+
+        <button
+          type="button"
+          class="showpass"
+          data-target="password"
+        >
+          SHOW
+        </button>
+
+      </div>
+
+      <div class="password-hint">
+        Minimum 8 characters
+      </div>
+
+    </div>
+
+
+    <!-- CONFIRM PASSWORD -->
+
+    <div class="field">
+
+      <label for="confirmPassword">
+        Confirm Password
+      </label>
+
+      <div class="input-wrap">
+
+        <input
+          type="password"
+          id="confirmPassword"
+          name="confirmPassword"
+          class="password-input"
+          placeholder="Re-enter your password"
+          autocomplete="new-password"
+          required
+        >
+
+        <button
+          type="button"
+          class="showpass"
+          data-target="confirmPassword"
+        >
+          SHOW
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- SUBMIT -->
+
+    <button
+      type="submit"
+      id="submitBtn"
+      class="submit-btn"
+    >
+      Create Account
+    </button>
+
+  </form>
+    <!-- FOOTER -->
+
+  <div class="footer">
+
+    Already have an account?
+
+    <a href="login.html">
+      Login
+    </a>
+
+  </div>
+
+  <div class="bottom-note">
+    SECURE ACCOUNT · EVNTR
+  </div>
+
+</div>
+
+</div>
+
+
+<!-- SUPABASE LIBRARY -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+<script>
+
+// ========================================
+// KEEVO SUPABASE CONFIGURATION
+// ========================================
+
+const SUPABASE_URL =
+  "https://erbxsghhlnsqodwnalfk.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_DkgXw6CYjzEOmNFZ09r3FQ_85lp2B-c";
+
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+// ========================================
+// ELEMENTS
+// ========================================
+
+const signupForm =
+  document.getElementById("signupForm");
+
+const submitBtn =
+  document.getElementById("submitBtn");
+
+const messageBox =
+  document.getElementById("message");
+
+
+// ========================================
+// MESSAGE DISPLAY
+// ========================================
+
+function showMessage(text,type){
+
+  messageBox.textContent=text;
+
+  messageBox.className=
+    "message show "+type;
+
+  messageBox.scrollIntoView({
+    behavior:"smooth",
+    block:"nearest"
+  });
+
+}
+
+
+function hideMessage(){
+
+  messageBox.textContent="";
+
+  messageBox.className="message";
+
+}
+
+
+// ========================================
+// SHOW / HIDE PASSWORD
+// ========================================
+
+document
+  .querySelectorAll(".showpass")
+  .forEach(button=>{
+
+    button.addEventListener("click",function(){
+
+      const targetId=this.dataset.target;
+
+      const input=
+        document.getElementById(targetId);
+
+      if(input.type==="password"){
+
+        input.type="text";
+
+        this.textContent="HIDE";
+
+      }else{
+
+        input.type="password";
+
+        this.textContent="SHOW";
+
+      }
+
+    });
+
+  });
+
+
+// ========================================
+// USERNAME VALIDATION
+// ========================================
+
+function validateUsername(username){
+
+  return /^[a-zA-Z0-9_]{3,30}$/.test(username);
+
+}
+
+
+// ========================================
+// MOBILE VALIDATION
+// ========================================
+
+function validateMobile(mobile){
+
+  const digits=mobile.replace(/\D/g,'');
+
+  return digits.length>=10 &&
+         digits.length<=15;
+
+}
+
+
+// ========================================
+// BUTTON LOADING
+// ========================================
+
+function setLoading(loading){
+
+  submitBtn.disabled=loading;
+
+  if(loading){
+
+    submitBtn.innerHTML=
+      '<span class="loader"></span>Creating Account...';
+
+  }else{
+
+    submitBtn.textContent=
+      "Create Account";
+
+  }
+
+}
+  // ========================================
+// CREATE ACCOUNT
+// ========================================
+
+signupForm.addEventListener(
+  "submit",
+  async function(e){
+
+    e.preventDefault();
+
+    hideMessage();
+
+
+    // ====================================
+    // GET FORM DATA
+    // ====================================
+
+    const username=
+      document.getElementById("username")
+      .value
+      .trim()
+      .toLowerCase();
+
+    const businessName=
+      document.getElementById("businessName")
+      .value
+      .trim();
+
+    const mobile=
+      document.getElementById("mobile")
+      .value
+      .trim();
+
+    const email=
+      document.getElementById("email")
+      .value
+      .trim()
+      .toLowerCase();
+
+    const password=
+      document.getElementById("password")
+      .value;
+
+    const confirmPassword=
+      document.getElementById("confirmPassword")
+      .value;
+
+
+    // ====================================
+    // VALIDATE USERNAME
+    // ====================================
+
+    if(!validateUsername(username)){
+
+      showMessage(
+        "Username must contain 3–30 characters. Only letters, numbers and underscore are allowed.",
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    // ====================================
+    // VALIDATE BUSINESS NAME
+    // ====================================
+
+    if(businessName.length<2){
+
+      showMessage(
+        "Please enter a valid business name.",
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    // ====================================
+    // VALIDATE MOBILE
+    // ====================================
+
+    if(!validateMobile(mobile)){
+
+      showMessage(
+        "Please enter a valid mobile number.",
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    // ====================================
+    // VALIDATE PASSWORD
+    // ====================================
+
+    if(password.length<8){
+
+      showMessage(
+        "Password must contain at least 8 characters.",
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    // ====================================
+    // CONFIRM PASSWORD
+    // ====================================
+
+    if(password!==confirmPassword){
+
+      showMessage(
+        "Passwords do not match. Please check again.",
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    // ====================================
+    // LOADING
+    // ====================================
+
+    setLoading(true);
+
+
+    try{
+
+
+      // ==================================
+      // SUPABASE SIGNUP
+      // ==================================
+
+      const {
+        data,
+        error
+      } = await supabaseClient.auth.signUp({
+
+        email:email,
+
+        password:password,
+
+        options:{
+
+          data:{
+
+            username:username,
+
+            business_name:businessName,
+
+            mobile_number:mobile
+
+          }
+
+        }
+
+      });
+
+
+      // ==================================
+      // ERROR HANDLING
+      // ==================================
+
+      if(error){
+
+        const errMsg=
+          error.message.toLowerCase();
+
+
+        if(
+          errMsg.includes("profiles_username_unique") ||
+          errMsg.includes("username")
+        ){
+
+          showMessage(
+            "This username is already taken. Please choose another username.",
+            "error"
+          );
+
+        }
+
+        else if(
+          errMsg.includes("profiles_mobile_unique") ||
+          errMsg.includes("mobile_number")
+        ){
+
+          showMessage(
+            "This mobile number is already registered.",
+            "error"
+          );
+
+        }
+
+        else if(
+          errMsg.includes("already registered") ||
+          errMsg.includes("already exists")
+        ){
+
+          showMessage(
+            "This email is already registered. Please login instead.",
+            "error"
+          );
+
+        }
+
+        else{
+
+          showMessage(
+            error.message,
+            "error"
+          );
+
+        }
+
+        return;
+
+      }
+
+
+      // ==================================
+      // SUCCESS
+      // ==================================
+
+      if(data.user){
+
+        signupForm.reset();
+
+
+        // EMAIL VERIFICATION ENABLED
+        if(!data.session){
+
+          showMessage(
+            "Account created successfully! Please check your email and verify your account before login.",
+            "success"
+          );
+
+        }
+
+
+        // EMAIL VERIFICATION DISABLED
+        else{
+
+          showMessage(
+            "Your EVNTR account has been created successfully! You can now proceed to login.",
+            "success"
+          );
+
+        }
+
+      }
+
+
+    }
+
+    catch(err){
+
+      console.error("Signup error:",err);
+
+      showMessage(
+        "Something went wrong. Please try again.",
+        "error"
+      );
+
+    }
+
+
+    finally{
+
+      setLoading(false);
+
+    }
+
+  }
+);
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EVNTR | Login</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+:root{
+  --bg:#090a0c;
+  --panel:#121417;
+  --border:#292c32;
+  --gold:#d8b36d;
+  --gold2:#b99454;
+  --white:#f5f4f0;
+  --muted:#92969f;
+  --danger:#ff7777;
+  --success:#82d7a6;
+}
+
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 85% 5%,rgba(216,179,109,.10),transparent 35%),
+    radial-gradient(circle at 10% 90%,rgba(216,179,109,.04),transparent 30%),
+    var(--bg);
+  color:var(--white);
+  font-family:'DM Sans',sans-serif;
+}
+
+button,input{
+  font-family:inherit;
+}
+
+.page{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:30px 18px;
+}
+
+.container{
+  width:100%;
+  max-width:450px;
+}
+
+/* BRAND */
+
+.brand{
+  text-align:center;
+  margin-bottom:28px;
+}
+
+.logo{
+  width:54px;
+  height:54px;
+  border-radius:17px;
+  margin:0 auto 15px;
+  background:linear-gradient(135deg,#e5c887,#b28a4d);
+  color:#17130c;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'Manrope',sans-serif;
+  font-size:25px;
+  font-weight:900;
+  box-shadow:0 10px 35px rgba(216,179,109,.15);
+}
+
+.brandname{
+  font-family:'Manrope',sans-serif;
+  font-size:28px;
+  font-weight:800;
+  letter-spacing:4px;
+}
+
+.brand-sub{
+  color:var(--muted);
+  font-size:10px;
+  letter-spacing:4px;
+  margin-top:6px;
+}
+
+/* LOGIN CARD */
+
+.card{
+  background:rgba(18,20,23,.96);
+  border:1px solid var(--border);
+  border-radius:25px;
+  padding:30px 25px;
+  box-shadow:0 25px 80px rgba(0,0,0,.35);
+}
+
+.heading{
+  margin-bottom:26px;
+}
+
+.heading h1{
+  font-family:'Manrope',sans-serif;
+  font-size:26px;
+  font-weight:800;
+  letter-spacing:-.5px;
+}
+
+.heading p{
+  color:var(--muted);
+  font-size:13px;
+  margin-top:8px;
+  line-height:1.6;
+}
+
+.goldline{
+  width:38px;
+  height:3px;
+  border-radius:10px;
+  background:var(--gold);
+  margin-top:15px;
+}
+
+/* FORM */
+
+.form{
+  display:flex;
+  flex-direction:column;
+  gap:17px;
+}
+
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.field label{
+  font-size:12px;
+  color:#c8c9cc;
+  font-weight:600;
+}
+
+.input-wrap{
+  position:relative;
+}
+
+.field input{
+  width:100%;
+  height:51px;
+  padding:0 15px;
+  background:#0c0e11;
+  border:1px solid #2a2d33;
+  border-radius:13px;
+  color:#fff;
+  outline:none;
+  font-size:14px;
+  transition:.2s;
+}
+
+.field input::placeholder{
+  color:#626670;
+}
+
+.field input:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(216,179,109,.08);
+}
+  /* PASSWORD */
+
+.password-input{
+  padding-right:65px!important;
+}
+
+.showpass{
+  position:absolute;
+  right:13px;
+  top:50%;
+  transform:translateY(-50%);
+  border:none;
+  background:transparent;
+  color:var(--gold);
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+/* FORGOT PASSWORD */
+
+.forgot-row{
+  display:flex;
+  justify-content:flex-end;
+  margin-top:-6px;
+}
+
+.forgot-row a{
+  color:var(--gold);
+  text-decoration:none;
+  font-size:12px;
+  font-weight:600;
+}
+
+/* BUTTON */
+
+.submit-btn{
+  width:100%;
+  height:53px;
+  border:0;
+  border-radius:14px;
+  margin-top:5px;
+  background:linear-gradient(135deg,#e1c17f,#bd9658);
+  color:#17130c;
+  font-size:14px;
+  font-weight:800;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.submit-btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 12px 25px rgba(216,179,109,.15);
+}
+
+.submit-btn:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+  transform:none;
+}
+
+/* MESSAGE */
+
+.message{
+  display:none;
+  padding:13px 14px;
+  border-radius:12px;
+  font-size:12px;
+  line-height:1.6;
+  margin-bottom:18px;
+}
+
+.message.show{
+  display:block;
+}
+
+.message.error{
+  background:rgba(255,100,100,.08);
+  border:1px solid rgba(255,100,100,.2);
+  color:#ff9292;
+}
+
+.message.success{
+  background:rgba(100,220,150,.08);
+  border:1px solid rgba(100,220,150,.2);
+  color:#9ce2b6;
+}
+
+/* FOOTER */
+
+.footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:12px;
+  margin-top:23px;
+}
+
+.footer a{
+  color:var(--gold);
+  text-decoration:none;
+  font-weight:700;
+}
+
+.bottom-note{
+  text-align:center;
+  color:#626670;
+  font-size:10px;
+  margin-top:23px;
+  letter-spacing:.5px;
+}
+
+/* LOADING */
+
+.loader{
+  display:inline-block;
+  width:15px;
+  height:15px;
+  border:2px solid rgba(0,0,0,.2);
+  border-top-color:#17130c;
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+  vertical-align:middle;
+  margin-right:7px;
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg)}
+}
+
+/* RESPONSIVE */
+
+@media(max-width:480px){
+
+  .page{
+    padding:22px 14px;
+  }
+
+  .brand{
+    margin-bottom:23px;
+  }
+
+  .card{
+    padding:25px 19px;
+    border-radius:22px;
+  }
+
+  .heading h1{
+    font-size:24px;
+  }
+
+  .field input{
+    height:49px;
+  }
+
+}
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+<div class="container">
+
+<div class="brand">
+
+  <div class="logo">K</div>
+
+  <div class="brandname">EVNTR</div>
+
+  <div class="brand-sub">
+    EVENT BOOKING STUDIO
+  </div>
+
+</div>
+
+
+<div class="card">
+
+  <div class="heading">
+
+    <h1>Welcome back</h1>
+
+    <p>
+      Login to manage your bookings,
+      events and business.
+    </p>
+
+    <div class="goldline"></div>
+
+  </div>
+
+
+  <div id="message" class="message"></div>
+
+
+  <form id="loginForm" class="form">
+
+    <!-- EMAIL -->
+
+    <div class="field">
+
+      <label for="email">
+        Email Address
+      </label>
+
+      <input
+        type="email"
+        id="email"
+        placeholder="you@example.com"
+        autocomplete="email"
+        required
+      >
+
+    </div>
+
+
+    <!-- PASSWORD -->
+
+    <div class="field">
+
+      <label for="password">
+        Password
+      </label>
+
+      <div class="input-wrap">
+
+        <input
+          type="password"
+          id="password"
+          class="password-input"
+          placeholder="Enter your password"
+          autocomplete="current-password"
+          required
+        >
+
+        <button
+          type="button"
+          class="showpass"
+          id="togglePassword"
+        >
+          SHOW
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- FORGOT PASSWORD -->
+
+    <div class="forgot-row">
+
+      <a href="forgot-password.html">
+        Forgot password?
+      </a>
+
+    </div>
+
+
+    <!-- LOGIN BUTTON -->
+
+    <button
+      type="submit"
+      id="loginBtn"
+      class="submit-btn"
+    >
+      Login to 
+    </button>
+
+  </form>
+    <div class="footer">
+
+    Don't have an account?
+
+    <a href="create-account.html">
+      Create Account
+    </a>
+
+  </div>
+
+  <div class="bottom-note">
+    SECURE LOGIN · EVNTR
+  </div>
+
+</div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+<script>
+
+// ======================================
+// SUPABASE CONFIG
+// ======================================
+
+const SUPABASE_URL =
+  "https://erbxsghhlnsqodwnalfk.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_DkgXw6CYjzEOmNFZ09r3FQ_85lp2B-c";
+
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+// ======================================
+// ELEMENTS
+// ======================================
+
+const loginForm =
+  document.getElementById("loginForm");
+
+const loginBtn =
+  document.getElementById("loginBtn");
+
+const messageBox =
+  document.getElementById("message");
+
+
+// ======================================
+// SHOW MESSAGE
+// ======================================
+
+function showMessage(text,type){
+
+  messageBox.textContent=text;
+
+  messageBox.className=
+    "message show "+type;
+
+}
+
+
+function hideMessage(){
+
+  messageBox.textContent="";
+
+  messageBox.className="message";
+
+}
+
+
+// ======================================
+// SHOW / HIDE PASSWORD
+// ======================================
+
+document
+  .getElementById("togglePassword")
+  .addEventListener("click",function(){
+
+    const passwordInput=
+      document.getElementById("password");
+
+    if(passwordInput.type==="password"){
+
+      passwordInput.type="text";
+
+      this.textContent="HIDE";
+
+    }else{
+
+      passwordInput.type="password";
+
+      this.textContent="SHOW";
+
+    }
+
+  });
+
+
+// ======================================
+// LOADING
+// ======================================
+
+function setLoading(loading){
+
+  loginBtn.disabled=loading;
+
+  if(loading){
+
+    loginBtn.innerHTML=
+      '<span class="loader"></span>Logging in...';
+
+  }else{
+
+    loginBtn.textContent=
+      "Login to EVNTR";
+
+  }
+
+}
+
+
+// ======================================
+// LOGIN
+// ======================================
+
+loginForm.addEventListener(
+  "submit",
+  async function(e){
+
+    e.preventDefault();
+
+    hideMessage();
+
+    const email=
+      document.getElementById("email")
+      .value
+      .trim()
+      .toLowerCase();
+
+    const password=
+      document.getElementById("password")
+      .value;
+
+
+    setLoading(true);
+
+
+    try{
+
+      const {
+        data,
+        error
+      } = await supabaseClient.auth.signInWithPassword({
+
+        email:email,
+
+        password:password
+
+      });
+
+
+      // ERROR
+
+      if(error){
+
+        if(
+          error.message.toLowerCase()
+          .includes("invalid login credentials")
+        ){
+
+          showMessage(
+            "Incorrect email or password. Please try again.",
+            "error"
+          );
+
+        }
+
+        else if(
+          error.message.toLowerCase()
+          .includes("email not confirmed")
+        ){
+
+          showMessage(
+            "Please verify your email address before logging in.",
+            "error"
+          );
+
+        }
+
+        else{
+
+          showMessage(
+            error.message,
+            "error"
+          );
+
+        }
+
+        return;
+
+      }
+
+
+      // SUCCESS
+
+      if(data.session){
+
+        showMessage(
+          "Login successful! Opening EVNTR...",
+          "success"
+        );
+
+        setTimeout(()=>{
+
+          window.location.href="index.html";
+
+        },700);
+
+      }
+
+    }
+
+    catch(err){
+
+      console.error(err);
+
+      showMessage(
+        "Something went wrong. Please try again.",
+        "error"
+      );
+
+    }
+
+    finally{
+
+      setLoading(false);
+
+    }
+
+  }
+);
+  // ======================================
+// ALREADY LOGGED IN?
+// ======================================
+
+async function checkExistingSession(){
+
+  try{
+
+    const {
+      data:{
+        session
+      }
+    }=
+      await supabaseClient.auth.getSession();
+
+
+    if(session){
+
+      window.location.href="index.html";
+
+    }
+
+  }
+
+  catch(error){
+
+    console.error(
+      "Session check error:",
+      error
+    );
+
+  }
+
+}
+
+
+// ======================================
+// INITIALIZE
+// ======================================
+
+checkExistingSession();
+
+</script>
+
+</body>
+</html>
