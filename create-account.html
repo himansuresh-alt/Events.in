@@ -360,8 +360,6 @@ button,input{
 
 <div class="brand">
 
-  <div class="logo">K</div>
-
   <div class="brandname">EVNTR</div>
 
   <div class="brand-sub">
@@ -970,26 +968,15 @@ signupForm.addEventListener(
         signupForm.reset();
 
 
-        // EMAIL VERIFICATION ENABLED
-        if(!data.session){
+     // ACCOUNT CREATED SUCCESSFULLY
+showMessage(
+  "Account created successfully! Redirecting to login...",
+  "success"
+);
 
-          showMessage(
-            "Account created successfully! Please check your email and verify your account before login.",
-            "success"
-          );
-
-        }
-
-
-        // EMAIL VERIFICATION DISABLED
-        else{
-
-          showMessage(
-            "Your EVNTR account has been created successfully! You can now proceed to login.",
-            "success"
-          );
-
-        }
+setTimeout(() => {
+  window.location.href = "login.html";
+}, 1200);
 
       }
 
